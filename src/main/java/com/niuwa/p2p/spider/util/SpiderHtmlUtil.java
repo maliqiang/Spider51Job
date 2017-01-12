@@ -11,10 +11,15 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import sun.util.logging.resources.logging;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import com.niuwa.p2p.entity.CompanyInfo;
+import com.niuwa.p2p.entity.DetailDescInfo;
+import com.niuwa.p2p.entity.KeyWordSearchRsp;
+import com.niuwa.p2p.spider.dao.impl.CompanyInfoDao;
+import com.niuwa.p2p.spider.dao.impl.DetailInfoRspDao;
+import com.niuwa.p2p.spider.dao.impl.KeyWordSerachRspDao;
 
 
 
@@ -23,9 +28,15 @@ import com.niuwa.p2p.entity.CompanyInfo;
  * @author maliqiang
  * @since 2017年1月9日
  */
+@Repository
 public class SpiderHtmlUtil {
 	public static Logger log = LoggerFactory.getLogger(SpiderHtmlUtil.class);
-
+	@Autowired
+	private  CompanyInfoDao infoDao;
+	@Autowired
+	private  KeyWordSerachRspDao searchRspDao;
+	@Autowired
+	private  DetailInfoRspDao detailDao;
 	/**
 	 * 根据url已get方式获取数据
 	 * @param keyWord
@@ -92,6 +103,7 @@ public class SpiderHtmlUtil {
 		return rsp.toString().replace("charset=gb2312", "charset=UTF-8");
 
 	}
+	
 	/**
 	 * 打开职位搜索结果页
 	 * @param html
@@ -140,25 +152,34 @@ public class SpiderHtmlUtil {
 	 * @return
 	 * @throws Exception 
 	 */
-	public static CompanyInfo getCompanyInfo(String keyWord) throws Exception{
+	public CompanyInfo getCompanyInfo(String keyWord) throws Exception{
 		/**
 		 * 根据关键字查询职位
 		 */
-		String rsp = requestUrlByKeyWord(keyWord);
-//		template.save(rsp, "queryResult");
+		String rsp = SpiderHtmlUtil.requestUrlByKeyWord(keyWord );
+		KeyWordSearchRsp searchRsp = new KeyWordSearchRsp(rsp);
+		searchRspDao.insert(searchRsp);
 		/**
 		 * 获取职位搜索结果页url
 		 */
-		String href = getDesInfoUrl(rsp);
+		String href = SpiderHtmlUtil.getDesInfoUrl(rsp);
 		/**
 		 * 打开职位搜索结果页
 		 */
-		String info = requestUrl(href);
-//		System.out.println(info);
-//		template.save(info, "companyInfo");
-		String type = getCompanyKeyWord(info);
+		String info = SpiderHtmlUtil.requestUrl(href);
+		DetailDescInfo descInfo = new DetailDescInfo(href,info);
+		detailDao.insert(descInfo);
+		/**
+		 * 获取公司人数、类型、所属行业等信息
+		 */
+		String type = SpiderHtmlUtil.getCompanyKeyWord(info);
+		if(type==null){
+			log.error("获取公司详情页出错！");
+			return null;
+		}
 		String temp[] = type.split("\\|");
-		CompanyInfo res = new CompanyInfo(temp[0], temp[1], temp[2],temp[3]);
+		CompanyInfo res = new CompanyInfo(temp[1], temp[0], temp[2],temp[3]);
+		infoDao.insert(res);
 		return res;
 		
 	}

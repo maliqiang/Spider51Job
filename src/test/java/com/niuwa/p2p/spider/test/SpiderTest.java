@@ -15,7 +15,11 @@ import com.niuwa.p2p.spider.dao.impl.CompanyInfoDao;
 import com.niuwa.p2p.spider.dao.impl.DetailInfoRspDao;
 import com.niuwa.p2p.spider.dao.impl.KeyWordSerachRspDao;
 import com.niuwa.p2p.spider.util.SpiderHtmlUtil;
-
+/**
+ * 爬取数据测试类
+ * @author maliqiang
+ * @since 2017年1月11日
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={"classpath*:applicationContext.xml"})
 public class SpiderTest {
@@ -28,14 +32,23 @@ public class SpiderTest {
 	private KeyWordSerachRspDao searchRspDao;
 	@Autowired
 	private DetailInfoRspDao detailDao;
+	@Autowired
+	private SpiderHtmlUtil spiderUtil;
 	
+	/**
+	 * 分步测试
+	 * @throws Exception
+	 */
 	@Test
 	public void testSpider() throws Exception{
 		/**
+		 * eg.:
 		 * 百度在线网络技术
 		 * 美团点评
+		 * 上海易宝软件有限公司
+		 * 深圳市腾讯计算机系统有限公司
 		 */
-		String keyWord = "唯品会";
+		String keyWord = "上海易宝软件有限公司";
 		/**
 		 * 根据关键字查询职位
 		 */
@@ -65,4 +78,16 @@ public class SpiderTest {
 		infoDao.insert(res);
         System.out.println("DONE!");  
     }  
+	
+	/**
+	 * 根据公司名称获取详细信息
+	 * @throws Exception
+	 */
+	@Test
+	public void getCompanyInfo() throws Exception{
+		String keyWord = "深圳市腾讯计算机系统有限公司";
+		CompanyInfo info = spiderUtil.getCompanyInfo(keyWord);
+		log.info(info.toString());
+	}
+	
 }

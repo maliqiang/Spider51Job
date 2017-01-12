@@ -18,7 +18,13 @@ import org.springframework.stereotype.Repository;
 
 import com.mongodb.DB;
 import com.niuwa.p2p.spider.dao.BaseMongoDao;
-
+/**
+ * 通用数据库操作类
+ * @author maliqiang
+ * @since 2017年1月11日
+ * @version 1.0
+ * @param <T>
+ */
 @Repository  
 public class BaseDaoImpl<T> implements BaseMongoDao<T> {  
   
@@ -94,4 +100,5 @@ public class BaseDaoImpl<T> implements BaseMongoDao<T> {
         query.addCriteria(new Criteria(property).is(value));  
 		return (List<T>) this.mongoTemplate.find(query, getClz());
 	}
+	
 }  

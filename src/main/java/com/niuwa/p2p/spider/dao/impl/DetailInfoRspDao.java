@@ -8,11 +8,11 @@ import com.niuwa.p2p.entity.DetailDescInfo;
 public class DetailInfoRspDao extends BaseDaoImpl<DetailDescInfo> {
 
 	@Override
-	public void checkDB() {
+	public Class<?> getClz() {
 		// TODO Auto-generated method stub
-		super.checkDB();
+		return super.getClz();
 	}
-
+	
 	@Override
 	public void insert(DetailDescInfo t) {
 		super.insert(t);

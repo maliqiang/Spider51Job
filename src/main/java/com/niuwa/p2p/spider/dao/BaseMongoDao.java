@@ -21,6 +21,7 @@ public interface BaseMongoDao<T> {
     public void insert(T t);  
   
     public void update(T t);
+    
 	T findOne(String property, Object value);
   
 }  
